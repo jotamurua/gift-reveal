@@ -1,43 +1,47 @@
 const wrapper = document.getElementById("wrapper");
-const sound = document.getElementById("sound");
-let soundUnlocked = false;
-
-let opened = false;
-
 const message = document.getElementById("message");
+const sound = document.getElementById("sound");
 
 let step = 0;
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if (audioUnlocked) return;
+
+  sound.muted = true;
+  sound.play().then(() => {
+    sound.pause();
+    sound.currentTime = 0;
+    sound.muted = false;
+    audioUnlocked = true;
+  }).catch(() => {});
+}
 
 function openGift() {
   step++;
 
+  // STEP 1: ribbons
   if (step === 1) {
-    // if (!soundUnlocked) {
-    //   sound.play().then(() => {
-    //     sound.pause();
-    //     sound.currentTime = 0;
-    //     soundUnlocked = true;
-    //   }).catch(() => {});
-    // }
-  
     wrapper.classList.add("ribbons-off");
+    unlockAudio();
     return;
   }
-  
-  
 
-  // Paso 2: se va el papel
+  // STEP 2: papel
   if (step === 2) {
     wrapper.classList.add("opened");
     return;
   }
 
-  // Paso 3: final
+  // STEP 3: final
   if (step === 3) {
     message.hidden = false;
     message.classList.add("show");
-    launchConfetti();
-    playSound();
+
+    if (audioUnlocked) {
+      sound.currentTime = 0;
+      sound.play().catch(() => {});
+    }
   }
 }
 
@@ -49,6 +53,8 @@ if (isTouch) {
 } else {
   wrapper.addEventListener("click", openGift);
 }
+
+
 
 let canvas, ctx;
 
